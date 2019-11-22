@@ -1,18 +1,21 @@
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
+  Button,
   Image,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { toggleDarkMode } from '../redux/AppActions';
 
 import { MonoText } from '../components/StyledText';
 
-export default function HomeScreen() {
+function HomeScreen(props) {
   return (
     <View style={styles.container}>
       <ScrollView
@@ -41,11 +44,13 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>
-              Help, it didn’t automatically reload!
-            </Text>
-          </TouchableOpacity>
+          <Button
+            onPress={() => props.toggleDarkMode()}
+            title="Toggle Dark Mode"
+          />
+          <Text>
+            {`${props.app.darkMode}`}
+          </Text>
         </View>
       </ScrollView>
 
@@ -95,12 +100,6 @@ function DevelopmentModeNotice() {
 function handleLearnMorePress() {
   WebBrowser.openBrowserAsync(
     'https://docs.expo.io/versions/latest/workflow/development-mode/'
-  );
-}
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/workflow/up-and-running/#cant-see-your-changes'
   );
 }
 
@@ -184,11 +183,17 @@ const styles = StyleSheet.create({
     marginTop: 15,
     alignItems: 'center',
   },
-  helpLink: {
-    paddingVertical: 15,
-  },
   helpLinkText: {
     fontSize: 14,
     color: '#2e78b7',
   },
 });
+
+const mapStateToProps = ({ app }) => ({ app });
+const mapDispatchToProps = dispatch => (
+  bindActionCreators({
+    toggleDarkMode
+  }, dispatch)
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
